@@ -3,21 +3,24 @@ const bcryptjs = require('bcryptjs');
 
 const Usuario = require('../models/usuario');
 
-const usuariosGet = (req = request, res = response) => {
-    const {
-        q, 
-        nombre = 'No name', 
-        apikey, 
-        page = 7, 
-        limit
-    } = req.query;
+const usuariosGet = async(req = request, res = response) => {
+
+    let { limite = 5, desde = 0 } = req.query;
+    const query = {estado : true};
+
+    if(desde < 0 || typeof(desde) !== 'number') desde = 0;
+    if(limite < 0 || typeof(limite) !== 'number') limite = 1;
+
+    const [total, usuarios] = await Promise.all([
+        Usuario.countDocuments(query), //se cuentan solo los usuarios activos o en estado True
+        Usuario.find(query)
+            .skip(Number(desde))
+            .limit(Number(limite)),
+    ]);
+
     res.status(200).json({
-        msg: 'get API - controlador',
-        q,
-        nombre,
-        apikey,
-        page,
-        limit
+        total,
+        usuarios
     });
 };
 
@@ -46,25 +49,26 @@ const usuariosPatch = (req = request, res = respo) => {
 
 const usuariosPut = async(req = request, res = response) => {
     const id = req.params.id;
-    const {password, google, ...resto} = req.body;
+    const {_id,password, google, ...resto} = req.body;
 
-    //TODO: Validar en base de datos
-    const usuario = await Usuario.findByIdAndUpdate(id, resto);
-    if(password){
+    if(password !== null){
         const salt = bcryptjs.genSaltSync();
         resto.password = bcryptjs.hashSync(password, salt);
     }
-
+    
+    const usuario = await Usuario.findByIdAndUpdate(id, resto);
 
     res.status(200).json({
-        msg: 'put API - controlador',
-        id
+        usuario
     });
 }
 
-const usuariosDelete = (req = request, res = response) => {
+const usuariosDelete = async(req = request, res = response) => {
+    const { id } = req.params;
+
+    const usuario = await Usuario.findByIdAndUpdate(id, {estado: false});
     res.status(200).json({
-        msg: 'delete API - controlador'
+        usuario
     });
 };
 
