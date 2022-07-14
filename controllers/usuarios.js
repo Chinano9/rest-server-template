@@ -8,8 +8,8 @@ const usuariosGet = async(req = request, res = response) => {
     let { limite = 5, desde = 0 } = req.query;
     const query = {estado : true};
 
-    if(desde < 0 || typeof(desde) !== 'number') desde = 0;
-    if(limite < 0 || typeof(limite) !== 'number') limite = 1;
+    if(desde < 0 || isNaN(Number(desde)) ) desde = 0;
+    if(limite < 0 || isNaN(Number(limite)) ) limite = 1;
 
     const [total, usuarios] = await Promise.all([
         Usuario.countDocuments(query), //se cuentan solo los usuarios activos o en estado True
