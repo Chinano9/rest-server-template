@@ -1,39 +1,57 @@
-const {Router} = require('express');
-const { check } = require('express-validator');
+const { Router } = require('express');
+const { body, param } = require('express-validator');
 
-const { usuariosGet, usuariosPost, usuariosPut, usuariosPatch, usuariosDelete } = require('../controllers/usuarios');
-const { esRolValido, correoExiste, existeUsuarioPorID } = require('../helpers/db-validators');
-const { validarCampos } = require('../middlewares/validacion-campos');
+const {
+    validarCampos,
+    validarJWT,
+    esAdminRol,
+    tieneRol
+} = require('../middlewares')
 
+const { 
+    esRolValido, 
+    correoExiste, 
+    existeUsuarioPorID 
+} = require('../helpers/db-validators');
+
+const { usuariosGet,
+    usuariosPost, 
+    usuariosPut, 
+    usuariosPatch, 
+    usuariosDelete 
+} = require('../controllers/usuarios');
 
 const router = Router();
 
 router.get('/', usuariosGet);
 
 router.post('/', [
-    check('nombre', 'El nombre es obligatorio').not().isEmpty(),
-    check('password', 'El password debe tener al menos 8 caracteres').isLength({ min:8 }),
-    check('correo', 'El correo no es valido').isEmail(),
-    check('correo').custom( correoExiste ),
-    check('rol').custom( esRolValido ),
+    body('nombre', 'El nombre es obligatorio').not().isEmpty(),
+    body('password', 'El password debe tener al menos 8 caracteres').isLength({ min: 8 }),
+    body('correo', 'El correo no es valido').isEmail(),
+    body('correo').custom(correoExiste),
+    body('rol').custom(esRolValido),
     validarCampos
-],usuariosPost);
+], usuariosPost);
 
-router.put('/:id',[
-    check('id', 'No es un ID válido').isMongoId(),
-    check('id').custom( existeUsuarioPorID ),
-    check('password', 'El password debe tener al menos 8 caracteres').isLength({ min:8 }),
-    check('correo', 'El correo no es valido').isEmail(),
-    check('correo').custom( correoExiste ),
-    check('rol').custom( esRolValido ),
+router.put('/:id', [
+    param('id', 'No es un ID válido').isMongoId(),
+    param('id').custom(existeUsuarioPorID),
+    body('password', 'El password debe tener al menos 8 caracteres').isLength({ min: 8 }),
+    body('correo', 'El correo no es valido').isEmail(),
+    body('correo').custom(correoExiste),
+    body('rol').custom(esRolValido),
     validarCampos
 ], usuariosPut);
 
 router.patch('/', usuariosPatch);
 
-router.delete('/:id',[
-    check('id', 'No es un ID válido').isMongoId(),
-    check('id').custom( existeUsuarioPorID ),
+router.delete('/:id', [
+    validarJWT,
+    // esAdminRol,
+    tieneRol('ADMIN_ROLE', 'VENTAS_ROLE'),
+    param('id', 'No es un ID válido').isMongoId(),
+    param('id').custom(existeUsuarioPorID),
     validarCampos
 ], usuariosDelete);
 
