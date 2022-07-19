@@ -1,15 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite + Svelte</title>
-    <script type="module" crossorigin src="/assets/index.1103f510.js"></script>
     <link rel="stylesheet" href="/assets/index.f04340f8.css">
-  </head>
-  <body>
-    <div id="app"></div>
-    
-  </body>
+</head>
+
+<body>
+    <div id="g_id_onload" data-client_id="932825826778-qe66aqfbcf7ic7udak855ffsd9bvhouf.apps.googleusercontent.com"
+        data-callback="handleCredentialResponse" data-auto_prompt="false">
+    </div>
+    <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="sign_in_with"
+        data-shape="rectangular" data-logo_alignment="left">
+    </div>
+    <button id="google_signout">SignOut</button>
+    <script>
+        function handleCredentialResponse(response) {
+            //google token || id token
+            const body = {id_token: response.credential}
+            fetch('http://localhost:8080/api/auth/google', {
+                method:'POST',
+                headers:{
+                    'Content-Type':'application/json'
+                },
+                body:JSON.stringify(body)
+            })
+                .then(resp => resp.json())
+                .then(resp => {
+                    console.log(resp);
+                    localStorage.setItem('email', resp.usuario.correo)
+                })
+                .catch(console.warn);
+        }
+
+        const button = document.getElementById('google_signout');
+        button.onclick = ()=>{
+            google.accounts.id.disableAutoSelect();
+            google.accounts.id.revoke( localStorage.getItem('email'),done=>{
+                localStorage.removeItem('email');
+                location.reload();
+            });
+        }
+    </script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</body>
+
 </html>
