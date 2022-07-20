@@ -1,6 +1,16 @@
+/**
+ * Configuraciones y utilidades para las bases de datos
+ * @module Database
+ */
+
 const mongoose = require('mongoose');
 require('colors')
 
+/**
+ * Inicializa la coneccion a la base de datos MongoDB
+ * @async
+ * @throws Errores al conectarse a la base de datos
+ */
 const dbConection = async () => {
     try {
         await mongoose.connect( process.env.MONGODB_CNN, {

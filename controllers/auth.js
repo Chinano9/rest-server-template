@@ -1,3 +1,8 @@
+/**
+ * Controladores para las peticiones HTTP
+ * @module Controllers
+ */
+
 const {response, request, json} = require('express');
 const bcryptjs = require('bcryptjs');
 
@@ -5,6 +10,17 @@ const Usuario = require('../models/usuario');
 const {generarJWT} = require('../helpers/generar-jwt');
 const { googleVerify } = require('../helpers/google-verify');
 
+/**
+ * Funcion que inicia sesion comprobando las credenciales proporcionadas en el body.
+ * Si el correo no existe, el usuario esta bloqueado o la contraseña es incorrecta
+ * no permite el acceso.
+ * Si las credenciales son correctas admite al usuario y genera un JWT.
+ * @async
+ * @param {Express.Request} req `HTTP request` emitida por el cliente. La informacion proporcionada por el cliente, 
+ * debe tener el correo y la contraseña del usuario
+ * @param {Express.Response} res Respuesta que emite el servidor
+ * @returns {void}
+ */
 const login = async(req = request, res = response) => {
     const {correo, password} = req.body;
 
@@ -50,6 +66,17 @@ const login = async(req = request, res = response) => {
     }
 }
 
+/**
+ * Funcion que realiza el inicio de sesion de un usuario con Google SignIn.
+ * Si el usuario existe comprueba si este esta bloqueado, de ser así le niega
+ * el acceso, de no estarlo lo logea.
+ * Si el usuario no existe lo crea, usando la imagen, el correo y el 
+ * nombre proporcionados, ademas de asignarle el rol USER_ROLpor defecto.
+ * @async
+ * @param {Express.Request} req `HTTP request` emitida por el cliente
+ * @param {Express.Response} res `HTTP response` emitida por el servidor
+ * @returns {void} 
+ */
 const googleSignIn = async(req,res) => {
     const {id_token} = req.body;
     try{

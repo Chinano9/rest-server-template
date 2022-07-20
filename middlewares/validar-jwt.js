@@ -1,8 +1,21 @@
+/**
+ * Validadores para las requests HTTP
+ * @module Validators
+ */
+
 const { request } = require('express');
 const JWT = require('jsonwebtoken');
 
 const Usuario = require('../models/usuario');
 
+/**
+ * Comprueba que el JWT proporcionado en los headers sea valido.
+ * Responde al cliente dependiendo de si la validacion es correcta o no
+ * @param {Express.Request} req `HTTP request` emitida por el cliente, debe contener `xtoken` en sus `headers`
+ * @param {Express.Response} res `HTTP response` emitida por el servidor
+ * @param {Express.Application} next 
+ * @returns {({msg:string}|void)} Retorna un mensaje dependiendo del codigo de estado de la respuesta
+ */
 const validarJWT = async(req = request, res, next) => {
     const token = req.header("x-token");
 

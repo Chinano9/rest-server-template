@@ -3,9 +3,12 @@ const express = require('express');
 const cors = require('cors');
 const { dbConection } = require('../database/config');
 
-class Server{
+/**
+ * Crea el servidor de la aplicacion
+ */
+class Server {
 
-    constructor(){
+    constructor() {
         this.app = express();
         this.port = process.env.PORT;
         this.usuariosPath = '/api/usuarios';
@@ -21,11 +24,14 @@ class Server{
         this.routes();
     }
 
-    async conectarDB(){
+    async conectarDB() {
         await dbConection();
     }
 
-    middlewares(){
+    /**
+     * Inicializa los middlewares del servidor
+     */
+    middlewares() {
         //CORS
         this.app.use(cors());
 
@@ -36,14 +42,20 @@ class Server{
         this.app.use(express.static('public'))
     }
 
-    routes(){
+    /**
+     * Crea las rutas de la aplicacion
+     */
+    routes() {
         //usuarios
         this.app.use(this.usuariosPath, require('../routes/usuarios'));
         //autenticacion
         this.app.use(this.authPath, require('../routes/auth'))
     }
 
-    listen(){
+    /**
+     * Inicializa el servidor, y lo pone a escuhchar en el puerto especificado en la clase
+     */
+    listen() {
         this.app.listen(this.port, () => {
             console.log(`App escuchando en el puerto ${this.port}`.green.bold);
         });

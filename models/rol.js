@@ -1,5 +1,11 @@
+/**
+ * Esquemas de bases de datos
+ * @module Schemas
+ */
+
 const {Schema, model} = require('mongoose');
 
+/**El esquema que toman los roles en la DB */
 const RoleSchema = Schema({
     rol: {
         type: String,

@@ -1,0 +1,20 @@
+{
+    "plugins":[
+        "plugins/markdown"
+    ],
+    "opts":{
+        "template": "C:\\Users\\ponce\\AppData\\Roaming\\npm\\node_modules\\minami"
+    },
+    "source":{
+        "include": [
+            "routes",
+            "models",
+            "middlewares",
+            "helpers",
+            "database",
+            "controllers",
+            "",
+            "README.md"
+        ]
+    }
+}
