@@ -1,9 +1,10 @@
 {
     "plugins":[
-        "plugins/markdown"
+        "plugins/markdown",
+        "jsdoc-http-plugin"
     ],
     "opts":{
-        "template": "C:\\Users\\ponce\\AppData\\Roaming\\npm\\node_modules\\minami"
+        "template": "./node_modules/minami"
     },
     "source":{
         "include": [

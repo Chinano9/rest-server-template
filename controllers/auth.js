@@ -35,8 +35,8 @@ const login = async(req = request, res = response) => {
         //verificar si el usuario esta activo
 
         if(!usuario.estado){
-            return res.status(400).json({
-                msg: 'Usuario/Password no son correctos - inactivo'
+            return res.status(403).json({
+                msg: 'Este usuario no puede acceder'
             });
         }
 
@@ -45,7 +45,7 @@ const login = async(req = request, res = response) => {
 
         if(!validPassword){
             return res.status(400).json({
-                msg: 'Usuario/Password no son correctos - contraseña'
+                msg: 'Usuario/Password no son correctos'
             });
         }
 
