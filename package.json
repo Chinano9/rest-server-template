@@ -23,6 +23,7 @@
     "mongoose": "^6.4.3"
   },
   "devDependencies": {
+    "jsdoc": "^3.6.11",
     "jsdoc-http-plugin": "^0.3.2",
     "minami": "^1.2.3"
   }
