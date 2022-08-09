@@ -16,7 +16,7 @@ const Usuario = require('../models/usuario');
  * @param {Express.Application} next 
  * @returns {({msg:string}|void)} Retorna un mensaje dependiendo del codigo de estado de la respuesta
  */
-const validarJWT = async(req = request, res, next) => {
+const validarJWT = async(req, res, next) => {
     const token = req.header("x-token");
 
     if(!token){

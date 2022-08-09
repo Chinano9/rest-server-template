@@ -17,7 +17,6 @@ const Usuario = require('../models/usuario');
  * @param {Express.Response} res la respuesta que dara el servidor
  */
 const usuariosGet = async(req = request, res = response) => {
-
     let { limite = 5, desde = 0 } = req.query;
     const query = {estado : true};
 

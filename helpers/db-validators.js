@@ -3,13 +3,13 @@
  * @module Helpers
  */
 
-const Rol = require('../models/rol');
-const Usuario = require('../models/usuario')
+const { Rol, Usuario, Categoria } = require('../models');
 
 /**
  * Comprueba si el rol asignado es valido.
  * @async
  * @param {string} rol Rol del usuario tal como esta escrito en la DB
+ * @throws Error al comprobar que el rol no existe
  */
 const esRolValido = async(rol = '')=> {
     const existeRol = await Rol.findOne({rol});
@@ -44,8 +44,21 @@ const existeUsuarioPorID = async(id = '') => {
     }
 }
 
+/**
+ * Comprueba si el id de la categoria ya existe en la DB
+ * @param {string} id 
+ * @throws Error al comprobar que el id de categoria no existe o es invalido
+ */
+const existeCategoriaPorID = async(id) => {
+    const existeCategoria = await Categoria.findById(id);
+    if(!existeCategoria){
+        throw new Error(`El id ${id} no existe`)
+    }
+}
+
 module.exports = {
     esRolValido,
     correoExiste,
-    existeUsuarioPorID
+    existeUsuarioPorID,
+    existeCategoriaPorID
 }
