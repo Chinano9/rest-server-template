@@ -1,29 +1,67 @@
 const { Categoria } = require('../models/')
 
-// obtenerCategorias - paginado - total - papulate
-const obtenerCategorias = async(req, res) => {
-        try {
-            const { limite = 10, desde = 0 } = req.query;
-            const query = { estado: true };
+/**
+ * Obteiene las categorias de la DB y las muestra paginadas
+ * @param {Express.Request} req Debe contener en el query `limite` y `desde` como numeros
+ * @param {Express.Response} res Respuesta del servidor al cliente
+ * @returns {void} 
+ */
+const obtenerCategorias = async (req, res) => {
+    try {
+        const { limite = 1, desde = 0 } = req.query;
+        const query = { estado: true };
 
-            if (desde < 0 || isNaN(Number(desde))) res.json({ msg: 'desde debe ser un valor numerico posotivo' });
-            if (limite < 0 || isNaN(Number(limite))) res.json({ msg: 'limite debe ser un valor numerico posotivo' });
+        if (desde < 0 || isNaN(desde)) {
+            res.json({ msg: '"desde" debe ser un valor numerico positivo' });
+            return;
+        }
+        if (limite < 0 || isNaN(limite)) {
+            res.json({ msg: '"limite" debe ser un valor numerico positivo' });
+            return;
+        }
 
-            const [total, categorias] = await Promise.all([
-                Categorias.countDocuments(query),
-                Categorias.find(query)
+        const [total, categorias] = await Promise.all([
+            Categoria.countDocuments(query),
+            Categoria.find(query)
                 .skip(desde)
                 .limit(limite)
-            ]);
-            res.json(total, categorias);
-        } catch (error) {
-            console.log(error);
-            res.code(500).json({ msg: "Error de servidor, favor de comunicarse con el desarrollador" });
-        }
+                .populate('creador')
+        ]);
+        res.json({ total, categorias });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ msg: 'Error de servidor, favor de comunicarse con el desarrollador' });
     }
-    // obtenerCategoria - populate {}
+}
 
-const crearCategoria = async(req, res) => {
+/**
+ * Obtiene una categoria de la DB usando el parametro `id` enviado en la `request`
+ * @param {Express.Request} req Debe contener en sus params el `id` de la categoria que se desea obtener
+ * @param {Express.Response} res Respuesta del servidor al cliente
+ */
+const obtenerCategoria = async (req, res) => {
+    try {
+        const id = req.params.id;
+
+        const categoria = await Categoria.findById(id)
+            .populate('creador');
+
+        res.json({
+            categoria
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ msg: 'Error de servidor, favor de comunicarse con el desarrollador' });
+    }
+}
+
+/**
+ * Crea una categoria en la DB si esta no existe antes
+ * @param {*} req Debe contener en el body el valor `nombre`
+ * @param {*} res 
+ * @returns {void}
+ */
+const crearCategoria = async (req, res) => {
     const nombre = req.body.nombre.toUpperCase();
     try {
 
@@ -49,31 +87,46 @@ const crearCategoria = async(req, res) => {
     } catch (error) {
         console.log(error)
         res.status(500).json({
-            error: "Error interno del servidor, contacte al administrador"
+            error: 'Error interno del servidor, contacte al administrador'
         })
     }
 }
 
 // actualizarCategoria
-const actualizarCategoria = async(req, res) => {
+const actualizarCategoria = async (req, res) => {
     try {
+        const id = req.params.id;
+        const nombre = req.body.nombre.toUpperCase()
+        await Categoria.findByIdAndUpdate(id, {nombre, creador: req.usuario._id}, err => {
+            console.log(err);
+            res.status(404).json({ msg: 'No se encuentra la categoria seleccionada' });
+        })
 
     } catch (error) {
         console.log(error);
-        res.send(500).json({ msg: 'Error interno del servidor, contacte al administrador' });
+        res.status(500).json({ msg: 'Error interno del servidor, contacte al administrador' });
     }
 }
 
 // borrarCategoria - estado:false
-const borrarCategoria = async(req, res) => {
+const borrarCategoria = async (req, res) => {
     try {
-        const id = req.body.id;
-        
+        const id = req.params.id;
+        await Categoria.findByIdAndUpdate(id, {estado: false}, err => {
+            res.status(404).json({ msg: 'No se encuentra la categoria seleccionada' });
+        });
+
+        res.json({ msg: 'Categoria borrada de manera satisfactoria' });
     } catch (error) {
-        
+        console.log(error);
+        res.status(500).json({ msg: 'Error interno del servidor, contacte al administrador' });
     }
 }
 
 module.exports = {
-    crearCategoria
+    crearCategoria,
+    obtenerCategorias,
+    obtenerCategoria,
+    borrarCategoria,
+    actualizarCategoria
 }

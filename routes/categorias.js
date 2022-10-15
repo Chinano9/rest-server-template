@@ -7,7 +7,7 @@ const { body, param } = require('express-validator');
 
 const { validarJWT, validarCampos, esAdminRol } = require('../middlewares');
 const { existeCategoriaPorID } = require('../helpers/db-validators')
-const { crearCategoria } = require('../controllers/categorias');
+const { crearCategoria, obtenerCategorias, obtenerCategoria, actualizarCategoria, borrarCategoria } = require('../controllers/categorias');
 
 const router = Router();
 
@@ -15,8 +15,10 @@ const router = Router();
 /**
  * Obtiene todas las categorias registradas en la base de datos
  * @name ObtenerCategorias
+ * @params {number} desde El numero de categoria desde el que se quiere empezar
+ * @params {number} limite El numero de categoria hasta la que se quiere buscar
  */
-router.get('/', );
+router.get('/', obtenerCategorias);
 
 /**
  * Obtiene una sola categoria utilizando su ID
@@ -24,10 +26,10 @@ router.get('/', );
  * @path {GET} api/categorias
  * @params {string} ID de la categoria
  */
-router.get(':id', [
+router.get('/:id', [
     param('id').custom( existeCategoriaPorID ),
     validarCampos
-], );
+], obtenerCategoria);
 
 /**
  * Crea una categoria en la base de datos
@@ -50,24 +52,26 @@ router.post('/',[
  * @name ActualizarCategoriaPorID
  * @path {PUT} api/categorias
  * @params {string} ID de la categoria
+ * @header {string} x-token Un JsonWebToken valido en el servidor
  */
 router.put('/:id', [
     validarJWT,
     param('id').custom(existeCategoriaPorID),
     validarCampos
-]);
+], actualizarCategoria);
 
 /**
  * @name BorrarCategoriaPorID
  * @path {DELETE} api/categorias
  * @params {string} ID de la categoria
+ * @header {string} x-token Un JsonWebToken valido en el servidor
  */
 router.delete('/:id',[
     validarJWT,
     esAdminRol,
     param('id').custom(existeCategoriaPorID),
     validarCampos
-]);
+],borrarCategoria);
 
 
 module.exports = router;
